@@ -27,6 +27,7 @@ public class MainScreen implements Screen
     private BitmapFont _bitmapFont;
 
     private long _lastNanoTimeCounted;
+    private long _maxMs;
     private float _changeTimeSeconds;
     private float _angle;
     private int _fps;
@@ -83,7 +84,7 @@ public class MainScreen implements Screen
 
         _spriteBatch.begin();
 
-        _bitmapFont.draw( _spriteBatch, "FPS: " + _fps, 0, 15 );
+        _bitmapFont.draw( _spriteBatch, "FPS: " + _fps + ", max: " + _maxMs + "ms", 0, 15 );
 
         _spriteBatch.end();
     }
@@ -93,9 +94,16 @@ public class MainScreen implements Screen
         long deltaNano = TimeUtils.timeSinceNanos( _lastNanoTimeCounted );
         _lastNanoTimeCounted = TimeUtils.nanoTime();
 
+        long deltaMs = deltaNano / 1000000;
+        if( deltaMs > _maxMs )
+        {
+            _maxMs = deltaMs;
+        }
+
         _changeTimeSeconds += deltaNano;
         if( _changeTimeSeconds >= 1000000000 )
         {
+            _maxMs = 0;
             _changeTimeSeconds = 0;
             _fps = Gdx.graphics.getFramesPerSecond();
         }
