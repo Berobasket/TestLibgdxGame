@@ -13,10 +13,15 @@ public class TestGame extends Game
 		_adsManager = adsManager;
 	}
 
+	public AdsManager getAdsManager()
+	{
+		return _adsManager;
+	}
+
 	@Override
 	public void create()
 	{
-		this.setScreen( new AdsMenuScreen( _adsManager ) );
+		this.setScreen( new AdsMenuScreen( this ) );
 	}
 
 	@Override

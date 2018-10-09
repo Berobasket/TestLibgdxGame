@@ -3,7 +3,6 @@ package pl.com.berobasket.testgame.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
-import pl.com.berobasket.testgame.DummyAdsManager;
 import pl.com.berobasket.testgame.TestGame;
 
 public class DesktopLauncher

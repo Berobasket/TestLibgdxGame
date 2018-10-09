@@ -3,13 +3,9 @@ package pl.com.berobasket.testgame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * Created by bero on 2018-10-05.
@@ -17,56 +13,70 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class AdsMenuScreen implements Screen
 {
-    private AdsManager _adsManager;
-    private Stage _stage;
-    private Skin _skin;
+    private TestGame _testGame;
+    private Array<String> strings = new Array<String>();
+    private long _lastGCTime;
+    private long _createTime;
+    private long _lastLogTime;
+    private BitmapFont _font;
+    private SpriteBatch _spriteBatch;
 
-    public AdsMenuScreen( AdsManager adsManager )
+    public AdsMenuScreen( TestGame testGame )
     {
-        _adsManager = adsManager;
+        _testGame = testGame;
 
-        _stage = new Stage( new ScreenViewport() );
-        Gdx.input.setInputProcessor( _stage );
+        _createTime = System.currentTimeMillis();
 
-        _skin = new Skin( Gdx.files.internal( "uiskin.json" ) );
+        _font = new BitmapFont();
 
-        Table table = new Table( _skin );
-        table.setFillParent( true );
-        _stage.addActor( table );
-
-        TextButton interstitialTextButton = new TextButton( "Show interstitial", _skin );
-        interstitialTextButton.addListener( new ClickListener()
-        {
-            @Override
-            public void touchUp( InputEvent event, float x, float y, int pointer, int button )
-            {
-                super.touchUp( event, x, y, pointer, button );
-                _adsManager.showInterstitial();
-            }
-        } );
-
-        table.row();
-        table.add( interstitialTextButton );
+        _spriteBatch = new SpriteBatch();
     }
 
     @Override
     public void show()
     {
-        _adsManager.showBanner();
+        _testGame.getAdsManager().initialize();
     }
 
     @Override
     public void render( float delta )
     {
         Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
-        _stage.act( delta );
-        _stage.draw();
+
+        long currentTime = System.currentTimeMillis();
+
+        if( currentTime - _lastGCTime > 100 )
+        {
+            causeGC();
+            _lastGCTime = currentTime;
+        }
+
+        int timeSinceCreate = (int)( ( System.currentTimeMillis() - _createTime ) / 1000 );
+        if( currentTime - _lastLogTime > 1000 )
+        {
+            Gdx.app.log( TestGame.GAME_LOG, "Alive time: " + timeSinceCreate + " sec" );
+            _lastLogTime = currentTime;
+        }
+
+        _spriteBatch.begin();
+        _font.draw( _spriteBatch, timeSinceCreate + "s", 100, 100 );
+        _spriteBatch.end();
+    }
+
+    private void causeGC()
+    {
+        strings.clear();
+
+        for( int i = 0; i < 700000; i++ )
+        {
+            strings.add( String.valueOf( i ) );
+        }
     }
 
     @Override
     public void resize( int width, int height )
     {
-        _stage.getViewport().update( width, height, true );
+
     }
 
     @Override
@@ -90,6 +100,6 @@ public class AdsMenuScreen implements Screen
     @Override
     public void dispose()
     {
-        _stage.dispose();
+
     }
 }
