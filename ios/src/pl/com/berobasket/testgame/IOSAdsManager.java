@@ -35,7 +35,7 @@ public class IOSAdsManager implements AdsManager
 
     private void createBannerAd()
     {
-        _bannerAdView = new GADBannerView( GADAdSize.SmartBannerLandscape() );
+        _bannerAdView = new GADBannerView( GADAdSize.SmartBannerPortrait() );
 
         _bannerAdView.setAdUnitID( BANNER_AD_UNIT_ID );
 
